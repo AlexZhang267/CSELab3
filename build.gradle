@@ -1,0 +1,45 @@
+apply plugin: 'java'
+apply plugin: 'kotlin'
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'com.google.guava:guava:19.0'
+    testCompile "org.spockframework:spock-core:$spock_version"
+}
+
+buildscript {
+    ext.kotlin_version = '1.0.4'
+    ext.spock_version = '1.0-groovy-2.4'
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        jcenter()
+    }
+    buildscript {
+        repositories {
+            jcenter()
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.1'
+    distributionUrl = distributionUrl.replace("bin", "all")
+}
+
+task copyToLib << {
+    ['compile', 'runtime', 'testCompile'].each { mode ->
+        copy {
+            from configurations.getByName(mode).files
+            into "libs/${mode}"
+        }
+    }
+}
